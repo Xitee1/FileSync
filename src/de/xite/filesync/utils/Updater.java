@@ -26,6 +26,7 @@ public class Updater {
         }
         return null;
     }
+    
     public static boolean checkVersion() {
     	if(getVersion().equals(pl.getDescription().getVersion())) {
     		return false;
