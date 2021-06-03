@@ -1,0 +1,19 @@
+# The most important - MySQL:
+mysql:
+  host: '127.0.0.1'
+  user: 'admin'
+  password: 'YourPassword'
+  databse: 'minecraft'
+  useSSL: true
+
+# The Chat-Prefix
+prefix: '&7[&cFileSync&7] '
+
+# Change the default commands
+commands:
+  - fs
+  - filesync
+
+sync:
+  interval: 30 # Default: Check every 30 seconds for changed files
+  
