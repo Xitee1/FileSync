@@ -24,8 +24,7 @@ public class FileSync extends JavaPlugin{
 		
 		MySQL.connect();
 		
-		// Send analytics
-		//BStats
+		// Send BStats analytics
         int pluginId = 11567; // <-- Replace with the id of your plugin!
         BStatsMetrics metrics = new BStatsMetrics(this, pluginId);
         //Costom charts
