@@ -25,11 +25,11 @@ public class FileSync extends JavaPlugin{
 		MySQL.connect();
 		
 		// Send BStats analytics
-        int pluginId = 11567; // <-- Replace with the id of your plugin!
-        BStatsMetrics metrics = new BStatsMetrics(this, pluginId);
-        //Costom charts
-        metrics.addCustomChart(new BStatsMetrics.SimplePie("update_auto_update", () -> pl.getConfig().getBoolean("update.autoupdater") ? "Atktiviert" : "Deaktiviert"));
-        metrics.addCustomChart(new BStatsMetrics.SimplePie("update_notifications", () -> pl.getConfig().getBoolean("update.notification") ? "Atktiviert" : "Deaktiviert"));
+		int pluginId = 11567; // <-- Replace with the id of your plugin!
+		BStatsMetrics metrics = new BStatsMetrics(this, pluginId);
+		//Costom charts
+		metrics.addCustomChart(new BStatsMetrics.SimplePie("update_auto_update", () -> pl.getConfig().getBoolean("update.autoupdater") ? "Atktiviert" : "Deaktiviert"));
+		metrics.addCustomChart(new BStatsMetrics.SimplePie("update_notifications", () -> pl.getConfig().getBoolean("update.notification") ? "Atktiviert" : "Deaktiviert"));
 	}
 	
 	public static String getMessage(String config) {
