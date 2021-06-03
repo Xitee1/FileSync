@@ -1,19 +1,45 @@
-# The most important - MySQL:
+##################################
+### The most important - MySQL ###
+##################################
 mysql:
-  host: '127.0.0.1'
+  host: '127.0.0.1' # You should use 127.0.0.1 instead of localhost (It means the same)
+  port: 3306
   user: 'admin'
   password: 'YourPassword'
   databse: 'minecraft'
+  table-prefix: 'fs_'
   useSSL: true
 
-# The Chat-Prefix
-prefix: '&7[&cFileSync&7] '
-
+#############################
+### Configure the command ###
+#############################
 # Change the default commands
 commands:
   - fs
   - filesync
 
+# The permission that players need to execute the command ("none" to only allow console)
+permission: 'filesync.execute'
+
+####################
+### Sync-Options ###
+####################
+
+# Default: Change the sync interval. Default: 30 seconds
 sync:
-  interval: 30 # Default: Check every 30 seconds for changed files
+  interval: 30 
+
+######################
+### Plugin Updater ###
+######################
+update:
+  notification: true # Send a message to all Admins on join if a new update is available
+  autoupdater: false # With this option, the plugin will be automaticaly updatet
   
+################
+### Messages ###
+################
+message:
+  prefix: '&7[&cFileSync&7] '
+  onlyConsole: '&cYou can only execute this command from the console!'
+  noPerm: '&cYou do not have the permission to execute this command!'

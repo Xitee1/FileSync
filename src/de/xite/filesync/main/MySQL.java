@@ -15,12 +15,14 @@ import java.sql.SQLException;
 import org.bukkit.Bukkit;
 
 public class MySQL {
-	public static String host = "localhost";
-	public static String port = "3306";
-	public static String database = "minecraft";
-	public static String username = "admin";
-	public static String password = "";
-	public static boolean useSSL = true;
+	static FileSync pl = FileSync.pl;
+	public static String host = pl.getConfig().getString("mysql.host");
+	public static int port = pl.getConfig().getInt("mysql.port");
+	public static String username = pl.getConfig().getString("mysql.user");
+	public static String password = pl.getConfig().getString("mysql.password");
+	public static String database = pl.getConfig().getString("mysql.database");
+	public static String prefix = pl.getConfig().getString("mysql.table-prefix");
+	public static boolean useSSL = pl.getConfig().getBoolean("mysql.useSSL");
 	
 	public static Connection c;
 	public static void connect() {
