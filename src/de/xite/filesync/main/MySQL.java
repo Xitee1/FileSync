@@ -1,16 +1,11 @@
 package de.xite.filesync.main;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 
@@ -30,7 +25,7 @@ public class MySQL {
 			if(!isConnected()) {
 				c = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/"+database+"?autoReconnect=true&useSSL="+useSSL, username, password);
 				MySQL.update("CREATE TABLE IF NOT EXISTS `files` "
-						+ "(`id` INT NOT NULL AUTO_INCREMENT, `group` VARCHAR(555) NOT NULL, `commands` VARCHAR(555) NOT NULL, `path` VARCHAR(555) NOT NULL, `data` LONGBLOB NOT NULL, PRIMARY KEY (`id`)) "
+						+ "(`id` INT NOT NULL AUTO_INCREMENT, `group` VARCHAR(255) NOT NULL, `commands` VARCHAR(5555), `path` VARCHAR(5555) NOT NULL, `data` LONGBLOB NOT NULL, `modified` BIGINT, PRIMARY KEY (`id`)) "
 						+"ENGINE = InnoDB; DEFAULT CHARSET=utf8mb4;");
 				FileSync.pl.getLogger().info("MySQL connected!");
 			}
@@ -86,75 +81,109 @@ public class MySQL {
 		return true;
 	}
 	
-	
-    public static boolean writeFile(String filename) {
-        try {
-            // Check and prepare the file
-            File file = new File(filename);
-            // Check if File is bigger than 4GB (More is not supported)
-            if(file.length() >= 4e+9) {
-            	FileSync.pl.getLogger().severe("Could not upload File '"+file.getAbsolutePath()+"' (files bigger than 4GB are not supported)!");
-            	return false;
-            }
-            FileInputStream input = new FileInputStream(file);
-            
-            // Insert file in MySQL
-            PreparedStatement ps = c.prepareStatement("INSERT INTO files(`id`, `path`, `data`) VALUES (NULL, '"+filename+"', ?)");
-			ps.setBinaryStream(1, input);
-	        System.out.println("Uploading file "+file.getAbsolutePath()+" to MySQL...");
-	        
-	        ps.executeUpdate();
-	        return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-        return false;
-    }
-    public static boolean readFile(String path) {
-    	ResultSet rs = null;
-		try {
-	        // Check and prepare the file
-	        File file = new File(path);
-			FileOutputStream output = new FileOutputStream(file);
-			
-			// Download file form MySQL
-			PreparedStatement ps = c.prepareStatement("SELECT `data` FROM `files` WHERE `path`='"+path+"'");
-	        rs = ps.executeQuery();
-	        System.out.println("Downloading file "+file.getAbsolutePath()+" from MySQL...");
-	        while (rs.next()) {
-	        	InputStream input = rs.getBinaryStream("data");
-	        	byte[] buffer = new byte[1024];
-	        	while (input.read(buffer) > 0)
-	        		output.write(buffer);
-	        }
-	        output.close();
-	        return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-            try {
-    	        if(rs != null)
-                    rs.close();
-            } catch (SQLException e) {
-            	e.printStackTrace();
-            }
-        }
-		return false;
-    }
+	// --- API --- //
+	// Checks
 	public static boolean checkExists(String table, String value, String where) {
 		try {
-			ResultSet rs = MySQL.query("SELECT "+value+" FROM "+table+" WHERE "+where);
-			if(rs.next()) {
-				if(rs.getString(value.replace("`", "")) != null)
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where);
+			if(rs.next())
+				if(rs.getString(value) != null)
 					return true;
-			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	public static boolean checkEnabled(String table, String value, String where) {
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where);
+			if(rs.next())
+				if(rs.getString(value).equals("true"))
+					return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	// Get informations
+	public static Integer getInt(String table, String value, String where) {
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where);
+			if(rs.next())
+				return rs.getInt(value);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static Boolean getBoolean(String table, String value, String where) {
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where);
+			if(rs.next())
+				return rs.getBoolean(value);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	public static Double getDouble(String table, String value, String where) {
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where);
+			if(rs.next())
+				return rs.getDouble(value);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static Float getFloat(String table, String value, String where) {
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where);
+			if(rs.next())
+				return rs.getFloat(value);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static String getString(String table, String value, String where) {
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where);
+			if(rs.next())
+				return rs.getString(value);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static ArrayList<String> getStringList(String table, String value, String where){
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"` WHERE "+where+"");
+			if(rs.first())
+				while (rs.next())
+					if(!result.contains(rs.getString(value)))
+						result.add(rs.getString(value));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	public static ArrayList<String> getStringList(String table, String value){
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			ResultSet rs = MySQL.query("SELECT `"+value+"` FROM `"+table+"`");
+			if(rs.first())
+				while (rs.next())
+					if(!result.contains(rs.getString(value)))
+						result.add(rs.getString(value));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public static void deleteEntry(String table, String where) {
+		MySQL.update("DELETE FROM `"+table+"` WHERE "+where);
 	}
 }

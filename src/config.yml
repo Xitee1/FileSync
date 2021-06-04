@@ -1,3 +1,11 @@
+#####################################################################################################
+### FileSync - Automatically sync your files with all of your servers                             ###
+###                                                                                               ###
+### For bugreports and proposals join our Discord: https://discord.gg/p95cB9YQFJ                  ###
+###                                                                                               ###
+### You can find the source code at: https://github.com/Xitee1/FileSync                           ###
+#####################################################################################################
+
 ##################################
 ### The most important - MySQL ###
 ##################################
@@ -15,19 +23,19 @@ mysql:
 #############################
 # Change the default commands
 commands:
-  - fs
-  - filesync
+- fs
+- filesync
 
 # The permission that players need to execute the command ("none" to only allow console)
 permission: 'filesync.execute'
 
-####################
-### Sync-Options ###
-####################
-
-# Default: Change the sync interval. Default: 30 seconds
+#######################################################
+### Sync-Options (Only used if the API is disabled) ###
+#######################################################
 sync:
-  interval: 30 
+  interval: 30 # Change the sync interval. Default: 30 seconds
+  groups: # Which groups should be synced with THIS server
+  - default
 
 ######################
 ### Plugin Updater ###
@@ -35,6 +43,12 @@ sync:
 update:
   notification: true # Send a message to all Admins on join if a new update is available
   autoupdater: false # With this option, the plugin will be automaticaly updatet
+  
+###########
+### API ###
+###########
+# Only enable if you want to use the API
+api: false
   
 ################
 ### Messages ###
