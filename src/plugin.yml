@@ -1,5 +1,5 @@
 name: FileSync
-version: 0.1
+version: Beta 0.1
 author: Xitee
 main: de.xite.filesync.main.FileSync
 api-version: 1.13

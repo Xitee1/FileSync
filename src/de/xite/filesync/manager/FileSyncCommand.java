@@ -91,7 +91,6 @@ public class FileSyncCommand implements CommandExecutor {
 			s.sendMessage(FileSync.getMessage("removeFile.successful").replace("%file%", file).replace("%group%", group));
 			return true;
 		}
-
 		return true;
 	}
 }

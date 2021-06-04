@@ -3,8 +3,10 @@ package de.xite.filesync.main;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.xite.filesync.listener.JoinQuitListener;
 import de.xite.filesync.manager.FileSyncCommand;
 import de.xite.filesync.manager.FileSyncManager;
 import de.xite.filesync.utils.BStatsMetrics;
@@ -33,13 +35,15 @@ public class FileSync extends JavaPlugin{
 		// ---- Register Commands ---- //
 		for(String s : pl.getConfig().getStringList("commands"))
 			getCommand(s).setExecutor(new FileSyncCommand());
+		PluginManager pm = Bukkit.getPluginManager();
+		pm.registerEvents(new JoinQuitListener(), this);
 		
 		if(!MySQL.connect()) {
 			FileSync.pl.getLogger().severe("Disabling plugin because of MySQL errors...");
 			Bukkit.getPluginManager().disablePlugin(FileSync.pl);
 			return;
 		}
-		
+
 		// Send BStats analytics
 		int pluginId = 11567; // <-- Replace with the id of your plugin!
 		BStatsMetrics metrics = new BStatsMetrics(this, pluginId);
@@ -52,6 +56,7 @@ public class FileSync extends JavaPlugin{
 			FileSyncManager.setGroups(FileSync.pl.getConfig().getStringList("sync.groups"));
 			FileSyncManager.startSyncScheduler(pl.getConfig().getInt("sync.interval"));
 		}
+
 	}
 	
 	public static String getMessage(String config) {

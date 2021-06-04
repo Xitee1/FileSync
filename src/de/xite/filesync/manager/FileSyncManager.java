@@ -132,12 +132,17 @@ public class FileSyncManager {
 		FileSync.scheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(FileSync.pl, new Runnable() {
 			@Override
 			public void run() {
-				if(FileSync.debug)
-					FileSync.pl.getLogger().info("Starting synchronize all files...");
-				for(String group : FileSync.groups)
-					syncFiles(group);
-				if(FileSync.debug)
-					FileSync.pl.getLogger().info("Finished! Starting again in "+interval+" seconds.");
+				Bukkit.getScheduler().runTaskAsynchronously(FileSync.pl, new Runnable() {
+					@Override
+					public void run() {
+						if(FileSync.debug)
+							FileSync.pl.getLogger().info("Starting synchronize all files...");
+						for(String group : FileSync.groups)
+							syncFiles(group);
+						if(FileSync.debug)
+							FileSync.pl.getLogger().info("Finished! Starting again in "+interval+" seconds.");
+					}
+				});
 			}
 		}, interval*20, interval*20);
 	}

@@ -21,7 +21,7 @@ mysql:
 #############################
 ### Configure the command ###
 #############################
-# Change the default commands
+# Change the default commands (Not working yet! - Will be available in some new version - If it gets added you will see it in the changelog)
 commands:
 - fs
 - filesync
@@ -33,7 +33,7 @@ permission: 'filesync.command'
 ### Sync-Options (Only used if the API is disabled) ###
 #######################################################
 sync:
-  allowUpload: false # Allow that this server uploads modified files (YOU HAVE TO ENABLE this at least on one server!)
+  allowUpload: true # Allow that this server uploads modified files (You have to enable this at least on one server!)
   interval: 30 # Change the sync interval. Default: 30 seconds
   groups: # Which groups should be synced with THIS server
   - default
@@ -48,7 +48,7 @@ update:
 ###########
 ### API ###
 ###########
-# Only enable the API if you want to use "setGroups()" and "startSyncScheduler()"
+# Only enable the API if you want to use "setAllowUpload()", "setGroups()" and "startSyncScheduler()"
 # Before you use the API you should have a look at the description at https://github.com/Xitee1/FileSync
 api: false
 
