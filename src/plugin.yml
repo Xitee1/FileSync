@@ -1,7 +1,8 @@
 name: FileSync
 version: 0.1
 author: Xitee
-main: de.xite.filesync.main.Main
+main: de.xite.filesync.main.FileSync
+api-version: 1.13
 commands:
    fs:
    filesync:

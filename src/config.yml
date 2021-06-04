@@ -14,7 +14,7 @@ mysql:
   port: 3306
   user: 'admin'
   password: 'YourPassword'
-  databse: 'minecraft'
+  database: 'minecraft'
   table-prefix: 'fs_'
   useSSL: true
 
@@ -26,8 +26,8 @@ commands:
 - fs
 - filesync
 
-# The permission that players need to execute the command ("none" to only allow console)
-permission: 'filesync.execute'
+# The permission that players need to execute the command (set it to 'none' to only allow console)
+permission: 'filesync.command'
 
 #######################################################
 ### Sync-Options (Only used if the API is disabled) ###
@@ -42,18 +42,36 @@ sync:
 ######################
 update:
   notification: true # Send a message to all Admins on join if a new update is available
-  autoupdater: false # With this option, the plugin will be automaticaly updatet
+  autoupdater: false # With this option, the plugin will be automatically updatet
   
 ###########
 ### API ###
 ###########
-# Only enable if you want to use the API
+# Only enable the API if you want to use "setGroups()" and "startSyncScheduler()"
+# Before you use the API you should have a look at the description at https://github.com/Xitee1/FileSync
 api: false
+
+# Here you can enable debug messages if you have some problems
+debug: false 
   
 ################
 ### Messages ###
 ################
-message:
+messages:
   prefix: '&7[&cFileSync&7] '
   onlyConsole: '&cYou can only execute this command from the console!'
   noPerm: '&cYou do not have the permission to execute this command!'
+  listGroups:
+    msg: '&3All Groups:'
+    list: '&7-§b %group%'
+  listFiles:
+    notExist: '§cThis group does not exist!'
+    msg: '&3All files in group §b%group%$3:'
+    list: '&7-&b %file%'
+  addFile:
+    doesNotExists: '&cThis file does not exists on the disk!'
+    alreadyExists: '&cYou already added the file &b%file%&c to group §b%group%&c!'
+    successful: '&aYou have successfully added the file &b%file%&a to the group &b%group%'
+  removeFile:
+    notExist: '§cThe file &b%file%&c in the group §b%group%&c does not exists! Make sure to provide the whole path.'
+    successful: '&aYou have successfully deleted the file &b%file%&a in the group &b%group%'

@@ -30,7 +30,7 @@ public class FileSyncManager {
 	
 	
 	public boolean fileExists() {
-		return MySQL.checkExists("files", "id", "`group`='"+group+"' AND `path`='"+path+"'");
+		return MySQL.checkExists(MySQL.prefix+"files", "id", "`group`='"+group+"' AND `path`='"+path+"'");
 	}
 	public boolean writeFile() {
 		try {
@@ -46,14 +46,15 @@ public class FileSyncManager {
 			}
 			FileInputStream input = new FileInputStream(file);
 			// Insert file in MySQL
-			String sql = "INSERT INTO files(`id`, `group`, `commands`, `path`, `data`, `modified`) VALUES"
+			String sql = "INSERT INTO "+MySQL.prefix+"files(`id`, `group`, `commands`, `path`, `data`, `modified`) VALUES"
 					+ " (NULL, '"+group+"', NULL, '"+path+"', ?, '"+file.lastModified()+"')";
 			if(fileExists())
-				sql = "UPDATE `files` SET `data`=?, `modified`='"+file.lastModified()+"' WHERE `group`='"+group+"' AND `path`='"+path+"';";
+				sql = "UPDATE `"+MySQL.prefix+"files` SET `data`=?, `modified`='"+file.lastModified()+"' WHERE `group`='"+group+"' AND `path`='"+path+"';";
             
 			PreparedStatement ps = MySQL.c.prepareStatement(sql);
 			ps.setBinaryStream(1, input);
-			System.out.println("Uploading file "+file.getAbsolutePath()+" to MySQL...");
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Uploading file "+file.getAbsolutePath()+" to MySQL...");
 			
 			ps.executeUpdate();
 			return true;
@@ -71,9 +72,10 @@ public class FileSyncManager {
 			FileOutputStream output = new FileOutputStream(file);
 			
 			// Download file form MySQL
-			PreparedStatement ps = MySQL.c.prepareStatement("SELECT `data` FROM `files` WHERE `group`='"+group+"' AND `path`='"+path+"'");
+			PreparedStatement ps = MySQL.c.prepareStatement("SELECT `data` FROM `"+MySQL.prefix+"files` WHERE `group`='"+group+"' AND `path`='"+path+"'");
 			rs = ps.executeQuery();
-			System.out.println("Downloading file "+file.getAbsolutePath()+" from MySQL...");
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Downloading file "+file.getAbsolutePath()+" from MySQL...");
 			while (rs.next()) {
 				InputStream input = rs.getBinaryStream("data");
 				byte[] buffer = new byte[1024];
@@ -97,10 +99,10 @@ public class FileSyncManager {
 		return false;
 	}
 	public void deleteFile() {
-		MySQL.deleteEntry("files", "`group`='"+group+"' AND `path`='"+path+"'");
+		MySQL.deleteEntry(MySQL.prefix+"files", "`group`='"+group+"' AND `path`='"+path+"'");
 	}
-	public int getLastModified() {
-		return MySQL.getInt("files", "modified", "`group`='"+group+"' AND `path`='"+path+"'");
+	public Long getLastModified() {
+		return MySQL.getLong(MySQL.prefix+"files", "modified", "`group`='"+group+"' AND `path`='"+path+"'");
 	}
 	public void setCommands(ArrayList<String> commands) {
 		
@@ -109,25 +111,6 @@ public class FileSyncManager {
 		return null;
 	}
 	// ---- Static Methods ---- //
-	public static void checkForUpdates(String group) {
-		ArrayList<String> files = MySQL.getStringList("files", "path", "`group`='"+group+"'");
-		for(String s : files)
-			checkForUpdates(group, s);
-	}
-	public static void checkForUpdates(String group, String path) {
-		File file = new File(path);
-		FileSyncManager fsm = new FileSyncManager(group, path);
-		long local = file.lastModified();
-		int cloud = fsm.getLastModified();
-		if(cloud > local) {
-			// cloud file is newer -> Download file
-			fsm.readFile();
-		}
-		if(local > cloud) {
-			// local file is newer -> Upload file
-			fsm.writeFile();
-		}
-	}
 	public static void setGroups(List<String> groups) {
 		FileSync.groups.clear();
 		FileSync.groups.addAll(groups);
@@ -138,16 +121,45 @@ public class FileSyncManager {
 		FileSync.scheduler = Bukkit.getScheduler().scheduleSyncRepeatingTask(FileSync.pl, new Runnable() {
 			@Override
 			public void run() {
+				if(FileSync.debug)
+					FileSync.pl.getLogger().info("Starting synchronize all files...");
 				for(String group : FileSync.groups)
 					syncFiles(group);
+				if(FileSync.debug)
+					FileSync.pl.getLogger().info("Finished! Starting again in "+interval+" seconds.");
 			}
-		}, interval, interval);
+		}, interval*20, interval*20);
 	}
 	public static void syncFiles(String group) {
-		FileSyncManager.checkForUpdates(group);
+		if(FileSync.debug)
+			FileSync.pl.getLogger().info("Synchronizing group "+group+"...");
+		for(String s : MySQL.getStringList(MySQL.prefix+"files", "path", "`group`='"+group+"'"))
+			syncFiles(group, s);
 	}
 	public static void syncFiles(String group, String path) {
-		FileSyncManager.checkForUpdates(group, path);
+		File file = new File(path);
+		FileSyncManager fsm = new FileSyncManager(group, path);
+		
+		long local = 0;
+		long cloud = fsm.getLastModified();
+		if(file.exists())
+			local = file.lastModified();
+		
+		if(cloud > local) {
+			// cloud file is newer -> Download file
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Downloading file "+path+" from group "+group+"...");
+			fsm.readFile();
+		}
+		if(local > cloud) {
+			// local file is newer -> Upload file
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Uploading file "+path+" to group "+group+"...");
+			fsm.writeFile();
+		}
+		if(local == cloud) {
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("File "+path+" in group "+group+" has no changes.");
+		}
 	}
-	
 }

@@ -2,6 +2,7 @@ package de.xite.filesync.main;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.xite.filesync.manager.FileSyncCommand;
@@ -12,9 +13,10 @@ import net.md_5.bungee.api.ChatColor;
 public class FileSync extends JavaPlugin{
 	public static FileSync pl;
 	public static String pr;
+	public static boolean debug = false;
 	
 	public static int scheduler = 0;
-	public static ArrayList<String> groups;
+	public static ArrayList<String> groups = new ArrayList<>();
 	
 	@Override
 	public void onEnable() {
@@ -23,13 +25,19 @@ public class FileSync extends JavaPlugin{
 		pl.getConfig().options().copyDefaults(false);
 		pl.saveDefaultConfig();
 		pl.reloadConfig();
+		if(pl.getConfig().getBoolean("debug"))
+			debug = true;
 		
 		pr = ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("messages.prefix"));
 		// ---- Register Commands ---- //
 		for(String s : pl.getConfig().getStringList("commands"))
 			getCommand(s).setExecutor(new FileSyncCommand());
 		
-		MySQL.connect();
+		if(!MySQL.connect()) {
+			FileSync.pl.getLogger().severe("Disabling plugin because of MySQL errors...");
+			Bukkit.getPluginManager().disablePlugin(FileSync.pl);
+			return;
+		}
 		
 		// Send BStats analytics
 		int pluginId = 11567; // <-- Replace with the id of your plugin!
