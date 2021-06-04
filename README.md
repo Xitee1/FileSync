@@ -4,6 +4,7 @@ Sync your files with all of your Minecraft servers!
 Download on SpigotMC is coming soon (when the plugin is finished)!
 
 Developer-API:
+
 You just have to enable the API option in the config.yml if you want to use setGroups() and startSyncScheduler().
 The only thing this option does is to prevent that setGroups() and startSyncScheduler() gets executed when the plugin gets enabled.
 
