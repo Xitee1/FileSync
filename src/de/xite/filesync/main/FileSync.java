@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.xite.fiilesync.manager.FileSyncCommand;
-import de.xite.fiilesync.manager.FileSyncManager;
+import de.xite.filesync.manager.FileSyncCommand;
+import de.xite.filesync.manager.FileSyncManager;
 import de.xite.filesync.utils.BStatsMetrics;
 import net.md_5.bungee.api.ChatColor;
 

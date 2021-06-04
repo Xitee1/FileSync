@@ -1,4 +1,4 @@
-package de.xite.fiilesync.manager;
+package de.xite.filesync.manager;
 
 import java.io.File;
 import java.io.FileInputStream;

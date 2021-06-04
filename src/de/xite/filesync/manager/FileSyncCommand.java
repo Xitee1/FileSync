@@ -1,4 +1,4 @@
-package de.xite.fiilesync.manager;
+package de.xite.filesync.manager;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
