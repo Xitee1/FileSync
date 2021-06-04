@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 
 import de.xite.filesync.main.FileSync;
@@ -33,7 +34,16 @@ public class FileSyncManager {
 		return MySQL.checkExists(MySQL.prefix+"files", "id", "`group`='"+group+"' AND `path`='"+path+"'");
 	}
 	public boolean writeFile() {
+		if(file.isDirectory()) {
+			for(File f : FileUtils.listFiles(file, null, true)) {
+				FileSyncManager fsm = new FileSyncManager(group, path+"/"+f.getName());
+				fsm.writeFile();
+			}
+		}
+		
 		try {
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Uploading file "+path+" to group "+group+"...");
 			// Check if File is bigger than 4GB (More is not supported)
 			if(file.length() >= 4e+9) {
 				FileSync.pl.getLogger().severe("Could not upload File '"+file.getAbsolutePath()+"' (files bigger than 4GB are not supported)!");
@@ -53,9 +63,6 @@ public class FileSyncManager {
             
 			PreparedStatement ps = MySQL.c.prepareStatement(sql);
 			ps.setBinaryStream(1, input);
-			if(FileSync.debug)
-				FileSync.pl.getLogger().info("Uploading file "+file.getAbsolutePath()+" to MySQL...");
-			
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException e) {
@@ -68,21 +75,22 @@ public class FileSyncManager {
 	public boolean readFile() {
 		ResultSet rs = null;
 		try {
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Downloading file "+path+" from group "+group+"...");
 			// Check and prepare the file
 			FileOutputStream output = new FileOutputStream(file);
-			
+			file.mkdirs();
 			// Download file form MySQL
 			PreparedStatement ps = MySQL.c.prepareStatement("SELECT `data` FROM `"+MySQL.prefix+"files` WHERE `group`='"+group+"' AND `path`='"+path+"'");
 			rs = ps.executeQuery();
-			if(FileSync.debug)
-				FileSync.pl.getLogger().info("Downloading file "+file.getAbsolutePath()+" from MySQL...");
+			if(file.exists())
+				file.delete();
 			while (rs.next()) {
 				InputStream input = rs.getBinaryStream("data");
-				byte[] buffer = new byte[1024];
-				while (input.read(buffer) > 0)
-					output.write(buffer);
+				FileUtils.copyInputStreamToFile(input, file);
 			}
 			output.close();
+			file.setLastModified(getLastModified());
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -111,6 +119,9 @@ public class FileSyncManager {
 		return null;
 	}
 	// ---- Static Methods ---- //
+	public static void setAllowUpload(boolean b) {
+		FileSync.allowUpload = b;
+	}
 	public static void setGroups(List<String> groups) {
 		FileSync.groups.clear();
 		FileSync.groups.addAll(groups);
@@ -147,19 +158,15 @@ public class FileSyncManager {
 		
 		if(cloud > local) {
 			// cloud file is newer -> Download file
-			if(FileSync.debug)
-				FileSync.pl.getLogger().info("Downloading file "+path+" from group "+group+"...");
 			fsm.readFile();
 		}
-		if(local > cloud) {
+		if(local > cloud && FileSync.allowUpload) {
 			// local file is newer -> Upload file
-			if(FileSync.debug)
-				FileSync.pl.getLogger().info("Uploading file "+path+" to group "+group+"...");
 			fsm.writeFile();
 		}
 		if(local == cloud) {
 			if(FileSync.debug)
-				FileSync.pl.getLogger().info("File "+path+" in group "+group+" has no changes.");
+				FileSync.pl.getLogger().info("File "+path+" has no changes.");
 		}
 	}
 }

@@ -14,6 +14,7 @@ public class FileSync extends JavaPlugin{
 	public static FileSync pl;
 	public static String pr;
 	public static boolean debug = false;
+	public static boolean allowUpload = false;
 	
 	public static int scheduler = 0;
 	public static ArrayList<String> groups = new ArrayList<>();
@@ -47,6 +48,7 @@ public class FileSync extends JavaPlugin{
 		metrics.addCustomChart(new BStatsMetrics.SimplePie("update_notifications", () -> pl.getConfig().getBoolean("update.notification") ? "Aktiviert" : "Deaktiviert"));
 		
 		if(!pl.getConfig().getBoolean("api")) {
+			FileSyncManager.setAllowUpload(pl.getConfig().getBoolean("sync.allowUpload"));
 			FileSyncManager.setGroups(FileSync.pl.getConfig().getStringList("sync.groups"));
 			FileSyncManager.startSyncScheduler(pl.getConfig().getInt("sync.interval"));
 		}

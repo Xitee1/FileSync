@@ -33,6 +33,7 @@ permission: 'filesync.command'
 ### Sync-Options (Only used if the API is disabled) ###
 #######################################################
 sync:
+  allowUpload: false # Allow that this server uploads modified files (YOU HAVE TO ENABLE this at least on one server!)
   interval: 30 # Change the sync interval. Default: 30 seconds
   groups: # Which groups should be synced with THIS server
   - default
