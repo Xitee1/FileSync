@@ -149,4 +149,5 @@ public class FileSyncManager {
 	public static void syncFiles(String group, String path) {
 		FileSyncManager.checkForUpdates(group, path);
 	}
+	
 }
