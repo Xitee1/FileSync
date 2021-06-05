@@ -8,7 +8,7 @@ You only have to enable the API option in the config.yml if you want to use "set
 The only thing this option does is to prevent that "setAllowUpload()", "setGroups()" and "startSyncScheduler()" gets executed when the plugin gets enabled.
 
 If you use the Sync-System:
-You just have to set the groups if you want to use the startSyncScheduler() method.
+You have to set the groups if you want to use the startSyncScheduler() method.
 Also, you don't have to use the startSyncScheduler method. You can also do this scheduler by yourself.
 The syncScheduler just executes syncFiles(group); for each group.
 
