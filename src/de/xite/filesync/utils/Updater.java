@@ -14,10 +14,10 @@ import de.xite.filesync.main.FileSync;
 
 public class Updater {
 	private static FileSync pl = FileSync.pl;
-	private static int pluginID = 00000;
+	private static int pluginID = 93054;
 	public static String version = null;
     public static String getVersion() {
-        /*try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + pluginID).openStream(); Scanner scanner = new Scanner(inputStream)) {
+        try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + pluginID).openStream(); Scanner scanner = new Scanner(inputStream)) {
             if (scanner.hasNext()) {
             	String d = scanner.next();
             	version = d;
@@ -26,9 +26,7 @@ public class Updater {
         } catch (IOException e) {
             pl.getLogger().info("Updater -> Cannot look for updates: " + e.getMessage());
         }
-        return "Could not check for updates! You probably restarted your server to often, so SpigotMC blocked your IP.";*/
-    	// I can't get my plugin ID before the plugin exists on SpigotMCs
-    	return "Beta 0.2";
+        return "Could not check for updates! You probably restarted your server to often, so SpigotMC blocked your IP.";
     }
     
     public static boolean checkVersion() {
