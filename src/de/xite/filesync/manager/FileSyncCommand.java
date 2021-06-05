@@ -2,17 +2,19 @@ package de.xite.filesync.manager;
 
 import java.io.File;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import de.xite.filesync.main.FileSync;
 import de.xite.filesync.main.MySQL;
 import de.xite.filesync.utils.Updater;
 import net.md_5.bungee.api.ChatColor;
 
-public class FileSyncCommand implements CommandExecutor {
+public class FileSyncCommand implements CommandExecutor, Listener {
 	static FileSync pl = FileSync.pl;
 	String pr = FileSync.pr;
 	String designLine1 = FileSync.pr+"§7X§e§m-----§6FileSync§e§m-----§7X";
@@ -90,6 +92,50 @@ public class FileSyncCommand implements CommandExecutor {
 			fsm.deleteFile();
 			s.sendMessage(FileSync.getMessage("removeFile.successful").replace("%file%", file).replace("%group%", group));
 			return true;
+		}else if(args.length == 1 && args[0].equalsIgnoreCase("sync")) {
+			s.sendMessage(FileSync.getMessage("forceSync.starting"));
+			Bukkit.getScheduler().runTaskAsynchronously(FileSync.pl, new Runnable() {
+				@Override
+				public void run() {
+					for(String group : FileSync.groups)
+						FileSyncManager.syncFiles(group);
+					Bukkit.getScheduler().runTask(pl, () -> s.sendMessage(FileSync.getMessage("forceSync.finished")));
+				}
+			});
+		}else if(args.length == 2 && args[0].equalsIgnoreCase("sync")) {
+			String group = args[1].toLowerCase();
+			s.sendMessage(FileSync.getMessage("forceSync.group.starting").replace("%group%", group));
+			Bukkit.getScheduler().runTaskAsynchronously(FileSync.pl, new Runnable() {
+				@Override
+				public void run() {
+					FileSyncManager.syncFiles(group);
+					Bukkit.getScheduler().runTask(pl, () -> s.sendMessage(FileSync.getMessage("forceSync.group.finished").replace("%group%", group)));
+				}
+			});
+		}else if(args.length == 3 && args[0].equalsIgnoreCase("sync")) {
+			String group = args[1].toLowerCase();
+			String file = args[2];
+			s.sendMessage(FileSync.getMessage("forceSync.file.starting").replace("%group%", group).replace("%file%", file));
+			Bukkit.getScheduler().runTaskAsynchronously(FileSync.pl, new Runnable() {
+				@Override
+				public void run() {
+					FileSyncManager.syncFiles(group, file);
+					Bukkit.getScheduler().runTask(pl, () -> s.sendMessage(FileSync.getMessage("forceSync.file.finished").replace("%group%", group).replace("%file%", file)));
+				}
+			});
+		}else if(args.length == 1 && args[0].equalsIgnoreCase("help")) {
+			s.sendMessage(FileSync.getMessage("help.msg"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf info; /sf about"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf menu (COMING SOON)"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf groups"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf list <group>"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf add <group> <file>"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf remove <group> <file>"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf sync [grou] [file]"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf help"));
+			s.sendMessage(FileSync.getMessage("help.fileWarning"));
+		}else {
+			s.sendMessage(FileSync.getMessage("wrongSyntax"));
 		}
 		return true;
 	}

@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -81,13 +80,23 @@ public class FileSyncManager {
 			FileOutputStream output = new FileOutputStream(file);
 			file.mkdirs();
 			// Download file form MySQL
-			PreparedStatement ps = MySQL.c.prepareStatement("SELECT `data` FROM `"+MySQL.prefix+"files` WHERE `group`='"+group+"' AND `path`='"+path+"'");
+			PreparedStatement ps = MySQL.c.prepareStatement("SELECT `commands`,`data` FROM `"+MySQL.prefix+"files` WHERE `group`='"+group+"' AND `path`='"+path+"'");
 			rs = ps.executeQuery();
 			if(file.exists())
 				file.delete();
-			while (rs.next()) {
-				InputStream input = rs.getBinaryStream("data");
-				FileUtils.copyInputStreamToFile(input, file);
+			if(rs.next()) {
+				// Write file
+				FileUtils.copyInputStreamToFile(rs.getBinaryStream("data"), file);
+				
+				// Execute commands
+				String commands = rs.getString("commands");
+				if(commands != null) {
+					if(commands.contains("%new%")) {
+						for(String s : commands.split("%new%"))
+							Bukkit.getScheduler().runTask(FileSync.pl, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), s));
+					}else
+						Bukkit.getScheduler().runTask(FileSync.pl, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commands));
+				}
 			}
 			output.close();
 			file.setLastModified(getLastModified());

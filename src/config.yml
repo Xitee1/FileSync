@@ -62,6 +62,7 @@ messages:
   prefix: '&7[&cFileSync&7] '
   onlyConsole: '&cYou can only execute this command from the console!'
   noPerm: '&cYou do not have the permission to execute this command!'
+  wrongSyntax: '&cWrong Syntax! Type &b/fs help&c to see all commands.'
   listGroups:
     msg: '&3All Groups:'
     list: '&7-§b %group%'
@@ -71,8 +72,22 @@ messages:
     list: '&7-&b %file%'
   addFile:
     doesNotExists: '&cThis file does not exists on the disk!'
-    alreadyExists: '&cYou already added the file &b%file%&c to group §b%group%&c!'
+    alreadyExists: '&cYou already added the file &b%file%&c to group &b%group%&c!'
     successful: '&aYou have successfully added the file &b%file%&a to the group &b%group%'
   removeFile:
-    notExist: '§cThe file &b%file%&c in the group §b%group%&c does not exists! Make sure to provide the whole path.'
+    notExist: '&cThe file &b%file%&c in the group §b%group%&c does not exists! Make sure to provide the whole path.'
     successful: '&aYou have successfully deleted the file &b%file%&a in the group &b%group%'
+  forceSync:
+    all:
+      starting: '&3Syncing all files...'
+      finished: '&aAll files are now up to date!'
+    group:
+      starting: '&3Syncing all files in group %group%...'
+      finished: '&aAll files in group %group% are now up to date!'
+    file:
+      starting: '&3Syncing the file %file% in group %group%...'
+      finished: '&aThe file is now synced!'
+  help:
+    msg: '&3All commands:'
+    list: '&7-&b %command%'
+    fileWarning: '&cIf the file is in a folder, you have to specify the folder! For example, you want to sync a plugin in the plugins folder. You have to type /fs add <group> plugins/SomePlugin.yml'

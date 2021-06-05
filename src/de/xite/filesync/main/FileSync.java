@@ -53,14 +53,20 @@ public class FileSync extends JavaPlugin{
 		
 		if(!pl.getConfig().getBoolean("api")) {
 			FileSyncManager.setAllowUpload(pl.getConfig().getBoolean("sync.allowUpload"));
-			FileSyncManager.setGroups(FileSync.pl.getConfig().getStringList("sync.groups"));
+			FileSyncManager.setGroups(pl.getConfig().getStringList("sync.groups"));
 			FileSyncManager.startSyncScheduler(pl.getConfig().getInt("sync.interval"));
 		}
-
+		pl.getDescription().save(null);
 	}
 	
 	public static String getMessage(String config) {
-		return pr + ChatColor.translateAlternateColorCodes('&', pl.getConfig().getString("messages."+config));
+		String msg = pl.getConfig().getString("messages."+config);
+		if(msg == null) {
+			pl.getLogger().severe("You have an error in your config.yml! Please check for spacing errors and if it's up to date.");
+			pl.getLogger().severe("Error: Could not find String message."+config);
+			return null;
+		}
+		return pr + ChatColor.translateAlternateColorCodes('&', msg);
 	}
 	
 	@Override
