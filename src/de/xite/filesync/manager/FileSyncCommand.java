@@ -78,7 +78,7 @@ public class FileSyncCommand implements CommandExecutor, Listener {
 			fsm.writeFile();
 			s.sendMessage(FileSync.getMessage("addFile.successful").replace("%file%", file).replace("%group%", group));
 			return true;
-		}else if(args.length == 3 && args[0].equalsIgnoreCase("remove")) {
+		}else if(args.length == 3 && (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("delete"))) {
 			// Delete files (Only from sync - no files on the servers will be deleted)
 			// Syntax: /fs remove <group> <file>
 			String group = args[1].toLowerCase();
@@ -93,13 +93,13 @@ public class FileSyncCommand implements CommandExecutor, Listener {
 			s.sendMessage(FileSync.getMessage("removeFile.successful").replace("%file%", file).replace("%group%", group));
 			return true;
 		}else if(args.length == 1 && args[0].equalsIgnoreCase("sync")) {
-			s.sendMessage(FileSync.getMessage("forceSync.starting"));
+			s.sendMessage(FileSync.getMessage("forceSync.all.starting"));
 			Bukkit.getScheduler().runTaskAsynchronously(FileSync.pl, new Runnable() {
 				@Override
 				public void run() {
 					for(String group : FileSync.groups)
 						FileSyncManager.syncFiles(group);
-					Bukkit.getScheduler().runTask(pl, () -> s.sendMessage(FileSync.getMessage("forceSync.finished")));
+					Bukkit.getScheduler().runTask(pl, () -> s.sendMessage(FileSync.getMessage("forceSync.all.finished")));
 				}
 			});
 		}else if(args.length == 2 && args[0].equalsIgnoreCase("sync")) {
@@ -123,15 +123,43 @@ public class FileSyncCommand implements CommandExecutor, Listener {
 					Bukkit.getScheduler().runTask(pl, () -> s.sendMessage(FileSync.getMessage("forceSync.file.finished").replace("%group%", group).replace("%file%", file)));
 				}
 			});
+		}else if(args.length == 1 && (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl"))) {
+			pl.reloadConfig();
+			if(!pl.getConfig().getBoolean("api")) {
+				Bukkit.getScheduler().cancelTask(FileSync.scheduler);
+				FileSyncManager.setAllowUpload(pl.getConfig().getBoolean("sync.allowUpload"));
+				FileSyncManager.setGroups(pl.getConfig().getStringList("sync.groups"));
+				FileSyncManager.startSyncScheduler(pl.getConfig().getInt("sync.interval"));
+			}
+			s.sendMessage(FileSync.getMessage("reload"));
+		}else if(args.length == 1 && args[0].equalsIgnoreCase("update")) {
+			s.sendMessage(FileSync.getMessage("update.downloading"));
+			Bukkit.getScheduler().runTaskAsynchronously(FileSync.pl, new Runnable() {
+				@Override
+				public void run() {
+					boolean b = Updater.downloadFile();
+					Bukkit.getScheduler().runTask(FileSync.pl, new Runnable() {
+						@Override
+						public void run() {
+							if(b) {
+								s.sendMessage(FileSync.getMessage("update.downloadFinished"));
+							}else
+								s.sendMessage(FileSync.getMessage("update.downloadFailed"));
+						}
+					});
+				}
+			});
 		}else if(args.length == 1 && args[0].equalsIgnoreCase("help")) {
 			s.sendMessage(FileSync.getMessage("help.msg"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf info; /sf about"));
-			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf menu (COMING SOON)"));
+			//s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf menu"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf groups"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf list <group>"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf add <group> <file>"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf remove <group> <file>"));
-			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf sync [grou] [file]"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf sync [group] [file]"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf reload"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf update"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf help"));
 			s.sendMessage(FileSync.getMessage("help.fileWarning"));
 		}else {

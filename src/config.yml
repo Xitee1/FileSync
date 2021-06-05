@@ -63,31 +63,39 @@ messages:
   onlyConsole: '&cYou can only execute this command from the console!'
   noPerm: '&cYou do not have the permission to execute this command!'
   wrongSyntax: '&cWrong Syntax! Type &b/fs help&c to see all commands.'
+  reload: '&aReloaded the config.'
+  update:
+    msg: '&7A new version is available (&bv%newest_version%&7)! Your version: &bv%current_version%'
+    updaterDisabled: '&7The auto-updater is disabled in your config.yml. Type &b/fs update &7to update to the newest version.'
+    updaterEnabled: '&7The plugin will be updated automatically after a server restart.'
+    downloading: '&7Downloading newest version...'
+    downloadFinished: '&7Download &asuccessful! &7Please &arestart &7your server to apply the new version.'
+    downloadFailed: '&cDownload failed! &7Please try it later again. The download-server currently not reachable.'
   listGroups:
-    msg: '&3All Groups:'
-    list: '&7-§b %group%'
+    msg: '&7All Groups:'
+    list: '&7-&b %group%'
   listFiles:
-    notExist: '§cThis group does not exist!'
-    msg: '&3All files in group §b%group%$3:'
+    notExist: '&cThis group does not exist!'
+    msg: '&7All files in group &b%group%&3:'
     list: '&7-&b %file%'
   addFile:
     doesNotExists: '&cThis file does not exists on the disk!'
     alreadyExists: '&cYou already added the file &b%file%&c to group &b%group%&c!'
-    successful: '&aYou have successfully added the file &b%file%&a to the group &b%group%'
+    successful: '&7You have &aadded&7 the folder/file &b%file%&7 to the group &b%group%'
   removeFile:
-    notExist: '&cThe file &b%file%&c in the group §b%group%&c does not exists! Make sure to provide the whole path.'
-    successful: '&aYou have successfully deleted the file &b%file%&a in the group &b%group%'
+    notExist: '&cThe file &b%file%&c in the group &b%group%&c does not exists! Make sure to provide the whole path.'
+    successful: '&7You have &cremoved&7 the file &b%file%&7 in the group &b%group%'
   forceSync:
     all:
-      starting: '&3Syncing all files...'
+      starting: '&7Syncing all files...'
       finished: '&aAll files are now up to date!'
     group:
-      starting: '&3Syncing all files in group %group%...'
+      starting: '&7Syncing all files in group %group%...'
       finished: '&aAll files in group %group% are now up to date!'
     file:
-      starting: '&3Syncing the file %file% in group %group%...'
+      starting: '&7Syncing the file %file% in group %group%...'
       finished: '&aThe file is now synced!'
   help:
-    msg: '&3All commands:'
+    msg: '&7All commands:'
     list: '&7-&b %command%'
-    fileWarning: '&cIf the file is in a folder, you have to specify the folder! For example, you want to sync a plugin in the plugins folder. You have to type /fs add <group> plugins/SomePlugin.yml'
+    fileWarning: '&cImportant: &7If the file is in a folder, you have to specify the folder! For example, you want to sync a plugin in the plugins folder. You have to type /fs add <group> plugins/SomePlugin.jar'

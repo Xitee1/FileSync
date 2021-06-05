@@ -56,7 +56,6 @@ public class FileSync extends JavaPlugin{
 			FileSyncManager.setGroups(pl.getConfig().getStringList("sync.groups"));
 			FileSyncManager.startSyncScheduler(pl.getConfig().getInt("sync.interval"));
 		}
-		pl.getDescription().save(null);
 	}
 	
 	public static String getMessage(String config) {

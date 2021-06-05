@@ -38,8 +38,8 @@ public class FileSyncManager {
 				FileSyncManager fsm = new FileSyncManager(group, path+"/"+f.getName());
 				fsm.writeFile();
 			}
+			return true;
 		}
-		
 		try {
 			if(FileSync.debug)
 				FileSync.pl.getLogger().info("Uploading file "+path+" to group "+group+"...");
