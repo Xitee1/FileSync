@@ -1,7 +1,7 @@
 # FileSync
 Sync your files with all of your Minecraft servers!
 
-Download on SpigotMC is coming soon (when the plugin is finished)!
+Download: https://www.spigotmc.org/resources/filesync-sync-your-files-with-your-servers.93054/
 
 ## Developer-API
 You only have to enable the API option in the config.yml if you want to use "setAllowUpload()", "setGroups()" and "startSyncScheduler()".
