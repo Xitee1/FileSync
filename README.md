@@ -22,7 +22,7 @@ FileSyncManager.syncFiles(group, group); // Sync a specific file
 
 // Manage a specific file
 FileSyncManager fsm = new FileSyncManager(group, path);
-fsm.writeFile(); // Add a new file to sync
+fsm.writeFile(); // Add a new file to sync (and force upload)
 fsm.setCommands(ArrayList<String>); // Set the commands
 fsm.getCommands(); // Returns the commands
 fsm.fileExists(); // Returns if the file exists (in the MySQL database)
