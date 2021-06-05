@@ -12,6 +12,8 @@ You have to set the groups if you want to use the startSyncScheduler() method.
 Also, you don't have to use the startSyncScheduler method. You can also do this scheduler by yourself.
 The syncScheduler just executes syncFiles(group); for each group.
 
+Don't forget to put "FileSync" as Depend or Softdepend
+
 ```java
 // Manage the Sync-System
 FileSyncManager.setAllowUpload(false); // Allow/Disallow this server to upload files
