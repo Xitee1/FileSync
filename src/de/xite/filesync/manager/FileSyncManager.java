@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +16,7 @@ import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 
 import de.xite.filesync.main.FileSync;
-import de.xite.filesync.main.MySQL;
+import de.xite.filesync.utils.MySQL;
 
 public class FileSyncManager {
 	File file;
@@ -63,10 +64,13 @@ public class FileSyncManager {
 			PreparedStatement ps = MySQL.c.prepareStatement(sql);
 			ps.setBinaryStream(1, input);
 			ps.executeUpdate();
+			input.close();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -77,16 +81,23 @@ public class FileSyncManager {
 			if(FileSync.debug)
 				FileSync.pl.getLogger().info("Downloading file "+path+" from group "+group+"...");
 			// Check and prepare the file
-			FileOutputStream output = new FileOutputStream(file);
+			
 			file.mkdirs();
 			// Download file form MySQL
 			PreparedStatement ps = MySQL.c.prepareStatement("SELECT `commands`,`data` FROM `"+MySQL.prefix+"files` WHERE `group`='"+group+"' AND `path`='"+path+"'");
 			rs = ps.executeQuery();
 			if(file.exists())
 				file.delete();
+			file.createNewFile();
 			if(rs.next()) {
 				// Write file
-				FileUtils.copyInputStreamToFile(rs.getBinaryStream("data"), file);
+				InputStream input = rs.getBinaryStream("data");
+				FileOutputStream output = new FileOutputStream(file);
+				
+				FileUtils.copyInputStreamToFile(input, file);
+				
+				input.close();
+	    	    output.close();
 				
 				// Execute commands
 				String commands = rs.getString("commands");
@@ -98,7 +109,6 @@ public class FileSyncManager {
 						Bukkit.getScheduler().runTask(FileSync.pl, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commands));
 				}
 			}
-			output.close();
 			file.setLastModified(getLastModified());
 			return true;
 		} catch (SQLException e) {
@@ -166,19 +176,23 @@ public class FileSyncManager {
 		FileSyncManager fsm = new FileSyncManager(group, path);
 		
 		long local = 0;
-		long cloud = fsm.getLastModified();
+		long mysql = fsm.getLastModified();
 		if(file.exists())
 			local = file.lastModified();
 		
-		if(cloud > local) {
+		if(mysql > local) {
 			// cloud file is newer -> Download file
 			fsm.readFile();
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Modified: local: "+local+"; mysql: "+mysql);
 		}
-		if(local > cloud && FileSync.allowUpload) {
+		if(local > mysql && FileSync.allowUpload) {
 			// local file is newer -> Upload file
 			fsm.writeFile();
+			if(FileSync.debug)
+				FileSync.pl.getLogger().info("Modified: local: "+local+"; mysql: "+mysql);
 		}
-		if(local == cloud) {
+		if(local == mysql) {
 			if(FileSync.debug)
 				FileSync.pl.getLogger().info("File "+path+" has no changes.");
 		}

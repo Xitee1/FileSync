@@ -1,4 +1,4 @@
-package de.xite.filesync.main;
+package de.xite.filesync.utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import de.xite.filesync.main.FileSync;
 
 public class MySQL {
 	static FileSync pl = FileSync.pl;

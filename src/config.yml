@@ -26,7 +26,7 @@ commands:
 - fs
 - filesync
 
-# The permission that players need to execute the command (set it to 'none' to only allow console)
+# The permission that players need to execute the command (set this to 'none' to only allow console)
 permission: 'filesync.command'
 
 #######################################################
@@ -42,7 +42,7 @@ sync:
 ### Plugin Updater ###
 ######################
 update:
-  notification: true # Send a message to all Admins on join if a new update is available
+  notification: true # Send a message to all admins on join if a new update is available
   autoupdater: false # With this option, the plugin will be automatically updatet
   
 ###########

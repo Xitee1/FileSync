@@ -1,4 +1,4 @@
-package de.xite.filesync.manager;
+package de.xite.filesync.commands;
 
 import java.io.File;
 
@@ -10,7 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import de.xite.filesync.main.FileSync;
-import de.xite.filesync.main.MySQL;
+import de.xite.filesync.manager.FileSyncManager;
+import de.xite.filesync.utils.MySQL;
 import de.xite.filesync.utils.Updater;
 import net.md_5.bungee.api.ChatColor;
 
@@ -132,6 +133,14 @@ public class FileSyncCommand implements CommandExecutor, Listener {
 				FileSyncManager.startSyncScheduler(pl.getConfig().getInt("sync.interval"));
 			}
 			s.sendMessage(FileSync.getMessage("reload"));
+		}else if(args.length == 1 && args[0].equalsIgnoreCase("debug")) {
+			if(FileSync.debug) {
+				s.sendMessage(FileSync.pr+ChatColor.GRAY+"Debug "+ChatColor.RED+"disabled.");
+				FileSync.debug = false;
+			}else {
+				s.sendMessage(FileSync.pr+ChatColor.GRAY+"Debug "+ChatColor.GREEN+"enabled.");
+				FileSync.debug = true;
+			}
 		}else if(args.length == 1 && args[0].equalsIgnoreCase("update")) {
 			s.sendMessage(FileSync.getMessage("update.downloading"));
 			Bukkit.getScheduler().runTaskAsynchronously(FileSync.pl, new Runnable() {
@@ -159,6 +168,7 @@ public class FileSyncCommand implements CommandExecutor, Listener {
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf remove <group> <file>"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf sync [group] [file]"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf reload"));
+			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf debug"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf update"));
 			s.sendMessage(FileSync.getMessage("help.list").replace("%command%", "/sf help"));
 			s.sendMessage(FileSync.getMessage("help.fileWarning"));
